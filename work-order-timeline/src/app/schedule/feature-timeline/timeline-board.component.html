@@ -1,0 +1,131 @@
+<div class="app-frame">
+  <div class="top-nav">
+    <div class="top-nav-inner">
+      <img class="brand" [src]="logoSrc" alt="Naologic" />
+    </div>
+  </div>
+
+  <main class="page">
+    <header class="timeline-header-bar">
+      <div class="heading-block">
+        <h1>Work Orders</h1>
+        <label class="timescale-field">
+          <div class="timescale-dropdown">
+            <button type="button" class="timescale-trigger" (click)="toggleTimescaleMenu.emit($event)">
+              <span class="timescale-label">Timescale</span>
+              <span class="timescale-value">{{ selectedZoomLabel }}</span>
+            </button>
+            @if (timescaleMenuOpen) {
+              <div class="timescale-menu">
+                @for (option of zoomOptions; track option.value) {
+                  <button type="button" [class.is-active]="zoomLevel === option.value" (click)="onSelectZoom(option.value, $event)">
+                    <span class="timescale-option-label">{{ option.label }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </label>
+      </div>
+    </header>
+
+    <section class="timeline-shell">
+      <div class="left-panel">
+        <div class="left-header">Work Center</div>
+        <div class="left-rows">
+          <div class="virtual-spacer" [style.height.px]="topSpacerHeight"></div>
+          @for (workCenter of visibleWorkCenters; track workCenter.id) {
+            <div
+              class="left-row"
+              [class.is-hovered]="hoveredWorkCenterId === workCenter.id"
+              (mouseenter)="rowHover.emit(workCenter.id)"
+              (mouseleave)="rowHover.emit(null)"
+            >
+              {{ workCenter.name }}
+            </div>
+          }
+          <div class="virtual-spacer" [style.height.px]="bottomSpacerHeight"></div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div #timelineViewport class="timeline-viewport" (scroll)="onViewportScroll($event)">
+          <div class="timeline-content" [style.width.px]="timelineVm.widthPx">
+            <div class="time-header-row">
+              @for (column of timelineVm.columns; track column.key) {
+                <div class="time-header-cell" [style.width.px]="column.widthPx">
+                  {{ column.label }}
+                </div>
+              }
+
+              @if (showCurrentMonthBadge && currentMonthBadgeLeft !== null) {
+                <div class="current-month-badge" [style.left.px]="currentMonthBadgeLeft">Current month</div>
+              }
+
+              @if (todayVisible) {
+                <div class="today-indicator" [style.left.px]="todayIndicatorLeft"></div>
+              }
+            </div>
+
+            <div class="virtual-spacer" [style.height.px]="topSpacerHeight"></div>
+            @for (workCenter of visibleWorkCenters; track workCenter.id) {
+              <div class="timeline-row" [class.has-open-menu]="hasOpenMenuForCenter(workCenter.id)" (click)="gridClick.emit({ event: $event, workCenterId: workCenter.id })">
+                <div class="row-grid">
+                  @for (column of timelineVm.columns; track column.key) {
+                    <div class="row-grid-cell" [style.width.px]="column.widthPx"></div>
+                  }
+                </div>
+
+                @if (todayVisible) {
+                  <div class="today-indicator" [style.left.px]="todayIndicatorLeft"></div>
+                }
+
+                @for (order of ordersForCenter(workCenter.id); track order.docId) {
+                  <article
+                    class="work-order-bar"
+                    [class.status-open]="order.status === 'open'"
+                    [class.status-in-progress]="order.status === 'in-progress'"
+                    [class.status-complete]="order.status === 'complete'"
+                    [class.status-blocked]="order.status === 'blocked'"
+                    [class.is-menu-open]="menuOpenFor === order.docId"
+                    [style.left.px]="getBarLeft(order)"
+                    [style.width.px]="getBarWidth(order)"
+                    tabindex="0"
+                    role="button"
+                    [attr.aria-label]="'Open actions for ' + order.workOrderNumber"
+                    (click)="onBarClick(order.docId, $event)"
+                    (keydown)="onBarKeydown(order.docId, $event)"
+                  >
+                    <div class="bar-main">
+                      <strong>{{ order.workOrderNumber }}</strong>
+                    </div>
+
+                    <span class="status-pill">{{ getStatusLabel(order.status) }}</span>
+
+                    <button
+                      type="button"
+                      class="actions-btn"
+                      (click)="$event.stopPropagation(); toggleMenu.emit({ orderId: order.docId, event: $event })"
+                    >
+                      ...
+                    </button>
+
+                    @if (menuOpenFor === order.docId) {
+                      <div class="actions-menu" (click)="$event.stopPropagation()">
+                        <button type="button" (click)="startEdit.emit({ order, event: $event })">Edit</button>
+                        <button type="button" class="delete-action" (click)="deleteOrder.emit({ orderId: order.docId, event: $event })">
+                          Delete
+                        </button>
+                      </div>
+                    }
+                  </article>
+                }
+              </div>
+            }
+            <div class="virtual-spacer" [style.height.px]="bottomSpacerHeight"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

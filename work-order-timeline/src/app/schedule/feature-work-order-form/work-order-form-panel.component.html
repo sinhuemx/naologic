@@ -1,0 +1,80 @@
+@if (panelOpen) {
+  <div class="panel-overlay" (click)="closePanel.emit()">
+    <aside class="work-order-panel" (click)="$event.stopPropagation()">
+      <div class="panel-head">
+        <div>
+          <h2>{{ panelTitle }}</h2>
+          <p class="panel-copy">Specify the dates, name and status for this order</p>
+        </div>
+        <div class="panel-actions-top">
+          <button type="button" class="btn-secondary" (click)="closePanel.emit()">Cancel</button>
+          <button type="button" class="btn-primary" (click)="saveOrder.emit()">{{ panelPrimaryAction }}</button>
+        </div>
+      </div>
+
+      <form [formGroup]="orderForm" novalidate>
+        <label>
+          <span class="work-order-name-label">Work Order Number</span>
+          <input type="text" formControlName="workOrderNumber" placeholder="WO-020" />
+          @if (hasControlError('workOrderNumber')) {
+            <small class="field-error">Work order number is required.</small>
+          }
+        </label>
+
+        <label>
+          <span>Work Center</span>
+          <ng-select
+            [items]="workCenters"
+            bindLabel="name"
+            bindValue="id"
+            [clearable]="false"
+            [searchable]="false"
+            formControlName="workCenterId"
+          >
+          </ng-select>
+        </label>
+
+        <label>
+          <span class="status-label">Status</span>
+          <ng-select
+            [items]="statusOptions"
+            bindLabel="label"
+            bindValue="value"
+            [clearable]="false"
+            [searchable]="false"
+            formControlName="status"
+            [class.status-select-open]="orderForm.value.status === 'open'"
+            [class.status-select-in-progress]="orderForm.value.status === 'in-progress'"
+            [class.status-select-complete]="orderForm.value.status === 'complete'"
+            [class.status-select-blocked]="orderForm.value.status === 'blocked'"
+          >
+          </ng-select>
+        </label>
+
+        <label>
+          <span class="start-date-label">Start Date</span>
+          <input type="datetime-local" formControlName="startDate" />
+          @if (hasControlError('startDate')) {
+            <small class="field-error">Start date is required.</small>
+          }
+        </label>
+
+        <label>
+          <span class="end-date-label">End Date</span>
+          <input type="datetime-local" formControlName="endDate" />
+          @if (hasControlError('endDate')) {
+            <small class="field-error">End date is required.</small>
+          }
+        </label>
+
+        @if (orderForm.errors?.['dateRange']) {
+          <p class="form-error">End date must be after start date.</p>
+        }
+
+        @if (formError) {
+          <p class="form-error">{{ formError }}</p>
+        }
+      </form>
+    </aside>
+  </div>
+}

@@ -1,0 +1,32 @@
+{
+  "reactRemote": {
+    "remoteEntry": "http://localhost:4301/remoteEntry.js",
+    "remoteName": "reactRemote",
+    "exposedModule": "./Mount",
+    "format": "script"
+  },
+  "vueRemote": {
+    "remoteEntry": "http://localhost:4302/remoteEntry.js",
+    "remoteName": "vueRemote",
+    "exposedModule": "./Mount",
+    "format": "script"
+  },
+  "emberRemote": {
+    "remoteEntry": "http://localhost:4304/remoteEntry.js",
+    "remoteName": "emberRemote",
+    "exposedModule": "./Mount",
+    "format": "script"
+  },
+  "scheduleBoardRemote": {
+    "remoteEntry": "http://localhost:4305/remoteEntry.js",
+    "remoteName": "scheduleBoardRemote",
+    "exposedModule": "./Mount",
+    "format": "script"
+  },
+  "workOrderEditorRemote": {
+    "remoteEntry": "http://localhost:4306/remoteEntry.js",
+    "remoteName": "workOrderEditorRemote",
+    "exposedModule": "./Mount",
+    "format": "script"
+  }
+}
